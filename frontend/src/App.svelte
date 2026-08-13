@@ -1,6 +1,7 @@
 <script lang="ts">
+  import Suite from './lib/Suite.svelte';
   type Role = 'orchestrator'|'bank'|'customer'|'airline'|'retailer'|'risk'|'investor';
-  type Section = 'overview'|'journey'|'economics'|'architecture'|'controls'|'roadmap';
+  type Section = 'overview'|'suite'|'journey'|'economics'|'architecture'|'controls'|'roadmap';
 
   const roles: Record<Role, any> = {
     orchestrator:{label:'Platform operator',abbr:'OP',color:'#69e7c1',objective:'Make the network reliable and repeatable',gives:['Workflow infrastructure','Partner integrations','Evidence & analytics'],gets:['Annual platform fees','Usage revenue','Defensible network data'],kpis:['99.95% uptime','<0.1% settlement errors','60%+ gross margin'],decision:'Can every participant win without the platform taking credit risk?'},
@@ -37,7 +38,7 @@
   let completionLift = 12;
   let partnerContribution = 18;
   let saved = false;
-  const nav: {id:Section;label:string}[] = [{id:'overview',label:'System map'},{id:'journey',label:'Operating journey'},{id:'economics',label:'Economics lab'},{id:'architecture',label:'Architecture'},{id:'controls',label:'Controls'},{id:'roadmap',label:'Implementation'}];
+  const nav: {id:Section;label:string}[] = [{id:'overview',label:'System map'},{id:'suite',label:'Business suite'},{id:'journey',label:'Operating journey'},{id:'economics',label:'Economics lab'},{id:'architecture',label:'Architecture'},{id:'controls',label:'Controls'},{id:'roadmap',label:'Implementation'}];
   $: r = roles[role];
   $: arr = loanVolume * monthlyFee * 12;
   $: completionValue = loanVolume * (completionLift/100) * 145;
@@ -82,6 +83,8 @@
       </section>
       <section class="metric-row">{#each r.kpis as metric,i}<article><span>0{i+1}</span><b>{metric}</b><small>{i===0?'PRIMARY OUTCOME':i===1?'HEALTH SIGNAL':'VALUE PROOF'}</small></article>{/each}</section>
       <div class="narrative"><span>THE BUSINESS IN ONE SENTENCE</span><p>A white-label bank platform converts verified repayment progress into funded partner benefits, intervenes before hardship becomes delinquency, and proves incremental value to every participant through a shared evidence layer.</p></div>
+    {:else if section==='suite'}
+      <Suite {role} roleLabel={r.label} roleColor={r.color}/>
     {:else if section==='journey'}
       <section class="section-head"><span>END-TO-END WORKFLOW</span><h2>From product approval to measurable outcome.</h2><p>Every step has an accountable owner, a customer-facing event, and evidence that survives audit.</p></section>
       <div class="timeline">{#each steps as step}<article><span class="num">{step.n}</span><div><small>{step.owner}</small><h3>{step.title}</h3><p>{step.body}</p><b>✓ {step.proof}</b></div></article>{/each}</div>

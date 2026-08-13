@@ -29,3 +29,16 @@ Open http://localhost:3000. Set `STATIC_DIR=../frontend/dist` when running from 
 ## Product boundary
 
 This is an educational and commercial operating-model application, not a lending, securities, custody, or credit-decision system. It is not legal, financial, or regulatory advice.
+
+## Full business suite
+
+Select **Business suite** and then choose any stakeholder perspective. Every perspective includes:
+
+- a role-specific operating cockpit and KPI layer;
+- four specialist software modules;
+- a persistent shared work queue;
+- a governed workflow builder;
+- cross-role handoff visualization; and
+- controlled status transitions from open through review, approval, and completion.
+
+The platform operator, bank, customer, airline, retailer, risk/compliance, and founder/investor workspaces share the Axum/rusqlite operating spine. See `BUSINESS_SUITE_IMPLEMENTATION_PLAN.md` for the production delivery phases and execution loop.
