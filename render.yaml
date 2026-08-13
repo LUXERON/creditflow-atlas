@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: creditflow-atlas
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_PATH
+        value: /app/data/creditflow.db
+    disk:
+      name: creditflow-data
+      mountPath: /app/data
+      sizeGB: 1
