@@ -1,122 +1,73 @@
 <script lang="ts">
-  import Suite from './lib/Suite.svelte';
-  type Role = 'orchestrator'|'bank'|'customer'|'airline'|'retailer'|'risk'|'investor';
-  type Section = 'overview'|'suite'|'journey'|'economics'|'architecture'|'controls'|'roadmap';
-
-  const roles: Record<Role, any> = {
-    orchestrator:{label:'Platform operator',abbr:'OP',color:'#69e7c1',objective:'Make the network reliable and repeatable',gives:['Workflow infrastructure','Partner integrations','Evidence & analytics'],gets:['Annual platform fees','Usage revenue','Defensible network data'],kpis:['99.95% uptime','<0.1% settlement errors','60%+ gross margin'],decision:'Can every participant win without the platform taking credit risk?'},
-    bank:{label:'Bank executive',abbr:'BK',color:'#8fb8ff',objective:'Improve completion, retention and lifetime value',gives:['Regulated loan product','Servicing & reporting','Customer distribution'],gets:['Higher completion','Lower servicing leakage','Graduation pipeline'],kpis:['+12% completion','-18% early exits','3.2× program LTV'],decision:'Does incremental value exceed rewards, compliance and integration cost?'},
-    customer:{label:'Credit builder',abbr:'CB',color:'#f6c66d',objective:'Build credit while receiving useful progress rewards',gives:['On-time repayments','Consent & engagement','Savings habit'],gets:['Credit history','Milestone benefits','Hardship support'],kpis:['12 on-time payments','Benefit clarity','Savings retained'],decision:'Is the product fair, understandable and useful every month?'},
-    airline:{label:'Airline loyalty',abbr:'AL',color:'#b99cff',objective:'Acquire future frequent travelers efficiently',gives:['Miles, passes & status boosts','Wholesale inventory','Campaign funding'],gets:['New loyalty members','Incremental bookings','Brand preference'],kpis:['Activated members','Route contribution','Redemption margin'],decision:'Does bank distribution beat paid acquisition on contribution margin?'},
-    retailer:{label:'Retail partner',abbr:'RT',color:'#ff9887',objective:'Convert bank customers into incremental shoppers',gives:['Vouchers & access','Offer inventory','Redemption data'],gets:['Basket uplift','Repeat purchase','Measured attribution'],kpis:['Incremental basket','Repeat rate','Campaign ROAS'],decision:'Are redemptions incremental rather than subsidizing existing spend?'},
-    risk:{label:'Risk & compliance',abbr:'RC',color:'#ef799c',objective:'Protect customers and preserve regulatory control',gives:['Approval gates','Monitoring standards','Stop authority'],gets:['Auditability','Data minimization','Controlled third parties'],kpis:['0 material breaches','Complaint parity','100% traceability'],decision:'Can the bank explain, monitor and stop every customer-impacting action?'},
-    investor:{label:'Founder / investor',abbr:'FI',color:'#9bd67a',objective:'Build durable recurring revenue with limited balance-sheet risk',gives:['Capital & governance','Commercial network','Execution runway'],gets:['Contracted ARR','Expansion revenue','Strategic moat'],kpis:['$1m pilot ARR','120%+ NRR','<18-month CAC payback'],decision:'Can pilots convert into multi-bank, multi-partner infrastructure?'},
+  type Role='ecosystem'|'borrower'|'bank'|'airline'|'retailer'|'buyer'|'platform';
+  type Chapter='model'|'lifecycle'|'roles'|'market'|'offtake'|'economics'|'software'|'diligence';
+  const roles:Record<Role,any>={
+    ecosystem:{icon:'∞',name:'Whole ecosystem',tag:'See every value loop',why:'A closed-loop economy connecting credit formation, loyalty currencies, retail intent and private liquidity.',contributes:['Orchestration rules','Shared market infrastructure','Cross-party settlement'],receives:['Lower defaults','New demand','Recurring fee pools'],win:'Every party exchanges an asset it has cheaply for something it values highly.'},
+    borrower:{icon:'CB',name:'Credit builder',tag:'Build credit + access liquidity',why:'Turn twelve months of invisible repayment effort into a visible asset whose utility unlocks each month.',contributes:['Monthly repayments','Credit-building behavior','Future utility rights if sold'],receives:['Credit history','Unlocked perks and yield','Emergency secondary-market cash'],win:'Keep the bond and compound benefits—or sell it for cash before hardship becomes default.'},
+    bank:{icon:'BK',name:'Issuing bank',tag:'Acquire, retain, monetize',why:'Differentiate the credit-builder loan with an upfront tradeable asset and a private liquidity safety valve.',contributes:['$2,000 secured loan','Bank-app distribution','Minting and reporting authority'],receives:['5% trade royalty','Lower default exposure','Prime-customer graduation pipeline'],win:'Convert a thin-file borrower into a retained 700+ score customer ready for higher-value products.'},
+    airline:{icon:'AL',name:'Airline loyalty',tag:'Monetize unused capacity',why:'Collateralize bonds with miles and lounge passes whose perceived value exceeds marginal fulfillment cost.',contributes:['50,000 miles','2 lounge passes','Wholesale loyalty inventory'],receives:['1% trade royalty','HNW traveler acquisition','Float, breakage and route demand'],win:'Sell predictable mile inventory and acquire both emerging customers and committed frequent-traveler whales.'},
+    retailer:{icon:'RT',name:'Retail partner',tag:'Own future purchase intent',why:'Embed store credit and VIP access inside the bond to replace paid-ad acquisition with guaranteed foot traffic.',contributes:['$300 store credit','VIP product access','Offer fulfillment'],receives:['Trade micro-royalty','Escrow yield share','Basket uplift and brand lock-in'],win:'A $50 unlocked credit can produce an $80–$100 basket while blocking competitor substitution.'},
+    buyer:{icon:'LP',name:'Buyer / liquidity fund',tag:'Buy discounted future utility',why:'Purchase partially unlocked bonds below the value of the perks, yield and credits the buyer can actually use.',contributes:['Immediate cash bids','$5m monthly backstop','Continuous market depth'],receives:['20% discounted bonds','Future utility and yield','Standby fee when unused'],win:'Acquire bank, airline and retail value at a disciplined discount with contracted deal flow.'},
+    platform:{icon:'CV',name:'CreditVault operator',tag:'Toll every value movement',why:'Provide the white-label smart-contract ledger, bank wallet, utility engine, marketplace and settlement layer.',contributes:['Protocol software','Partner integrations','Marketplace orchestration'],receives:['$10k–$50k monthly SaaS','0.5%–1% mint/trade toll','10% escrow-yield share'],win:'Take no lending or airline operating risk; collect recurring tolls from every coordinated flow.'}
   };
-
-  const steps = [
-    {n:'01',title:'Design & approve',owner:'Bank + Risk',body:'Define eligibility, milestones, reward funding, disclosures, hardship rules and stop conditions.',proof:'Approved product specification'},
-    {n:'02',title:'Enroll & consent',owner:'Customer + Bank',body:'Customer opens the bank’s credit-builder loan and separately accepts clear reward-program terms.',proof:'Versioned consent record'},
-    {n:'03',title:'Verify milestone',owner:'Platform',body:'Bank servicing event arrives through a signed API. Rules engine validates an on-time payment.',proof:'Immutable audit event'},
-    {n:'04',title:'Unlock benefit',owner:'Partner',body:'A fixed, funded entitlement is released—never represented as loan principal, collateral or investment yield.',proof:'Entitlement + funding record'},
-    {n:'05',title:'Intervene early',owner:'Bank',body:'Risk signals route the customer to bank-approved hardship options before a missed payment.',proof:'Customer-authorized action'},
-    {n:'06',title:'Settle & learn',owner:'All parties',body:'Redemptions reconcile, economics attribute, outcomes compare to a control cohort, and rules improve.',proof:'Board-ready outcome report'},
+  const chapters:{id:Chapter;label:string;num:string}[]=[['model','The model','01'],['lifecycle','Bond lifecycle','02'],['roles','Stakeholder lens','03'],['market','Secondary market','04'],['offtake','Take-or-pay','05'],['economics','Economics engine','06'],['software','Software architecture','07'],['diligence','Questions to resolve','08']].map(([id,label,num])=>({id:id as Chapter,label,num}));
+  const life=[
+    ['DAY 0','Originate','Customer opens a $2,000 secured credit-builder loan. Bank locks principal in savings.'],
+    ['DAY 1','Mint','Bank mints a $2,000 Credit-Yield Bond NFT into the customer’s embedded wallet.'],
+    ['MONTH 1–12','Unlock','Each verified on-time payment unlocks 1/12 of bank, airline and retailer utility.'],
+    ['ANY MONTH','Hold or sell','Customer retains compounding utility or lists the partially unlocked bond for cash.'],
+    ['TRADE','Settle','Buyer pays cash; smart contract transfers rights and splits bank, partner and protocol royalties.'],
+    ['MONTH 12','Graduate','Loan completes, savings unlock, credit file matures and the bank offers prime products.']
   ];
-
-  const controls = [
-    ['Product boundary','The platform does not lend, hold principal, make credit decisions or promise investment returns.','Bank legal'],
-    ['Consumer fairness','Plain-language value, expiry and forfeiture rules; no distressed secondary-market sale.','Compliance'],
-    ['Fair lending','Outcome monitoring by protected and vulnerable segments; human escalation.','Model risk'],
-    ['Partner funding','Every entitlement maps to an authorized inventory and settlement obligation.','Finance'],
-    ['Data governance','Consent, minimization, purpose limitation, retention and revocation controls.','Privacy'],
-    ['Operational resilience','Idempotent events, reconciliation, incident playbooks, exit and portability plan.','Technology risk'],
-  ];
-
-  let role: Role = 'orchestrator';
-  let section: Section = 'overview';
-  let loanVolume = 25000;
-  let monthlyFee = 2.4;
-  let completionLift = 12;
-  let partnerContribution = 18;
-  let saved = false;
-  const nav: {id:Section;label:string}[] = [{id:'overview',label:'System map'},{id:'suite',label:'Business suite'},{id:'journey',label:'Operating journey'},{id:'economics',label:'Economics lab'},{id:'architecture',label:'Architecture'},{id:'controls',label:'Controls'},{id:'roadmap',label:'Implementation'}];
-  $: r = roles[role];
-  $: arr = loanVolume * monthlyFee * 12;
-  $: completionValue = loanVolume * (completionLift/100) * 145;
-  $: partnerValue = loanVolume * partnerContribution;
-  $: ecosystemValue = arr + completionValue + partnerValue;
-
-  async function saveScenario(){
-    try { await fetch('/api/scenarios',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({role,loan_volume:loanVolume,monthly_fee:monthlyFee,completion_lift:completionLift,partner_contribution:partnerContribution})}); } catch {}
-    saved=true; setTimeout(()=>saved=false,1800);
-  }
+  const workflows:Record<Role,string[][]>={ecosystem:[['Contract','Bind bank, partners and liquidity'],['Mint','Create bond and utility rights'],['Unlock','Translate behavior into value'],['Trade','Move cash, rights and royalties']],borrower:[['Open loan','Accept secured loan and receive bond'],['Pay monthly','Trigger 1/12 utility unlock'],['Choose','Hold benefits or list for cash'],['Graduate','Receive savings and prime offers']],bank:[['Configure','Set loan, utility and royalty terms'],['Originate','Lock funds, mint bond, report payments'],['Operate market','Approve wallets and settle trades'],['Graduate','Cross-sell mortgage, card and auto']],airline:[['Commit supply','Take-or-pay 500m miles'],['Wrap utility','Attach miles and lounge passes'],['Earn','Collect wholesale cash + 1% royalties'],['Convert','Acquire committed HNW travelers']],retailer:[['Fund utility','Commit store credit and VIP access'],['Lock intent','Embed brand-specific future spend'],['Earn','Royalty + yield share + basket uplift'],['Learn','Observe customer purchasing-power graduation']],buyer:[['Underwrite','Value unlocked and future utility'],['Bid','Maintain 20%-discount liquidity'],['Acquire','Pay borrower instant cash'],['Monetize','Redeem perks or resell bond']],platform:[['Integrate','Bank core, wallets and partner ledgers'],['Mint','Run smart-contract lifecycle'],['Settle','Split cash and royalties per trade'],['Toll','Collect SaaS, mint, trade and yield fees']]};
+  let role:Role='ecosystem',chapter:Chapter='model',month=3,face=2000,bid=600,trades=3,annualMint=50000000,actualMint=20000000,saas=25000,mintFee=.75,tradeFee=1,bankRoyalty=5,partnerRoyalty=1;
+  $: utilityUnlocked=face*(month/12); $: remaining=face-utilityUnlocked; $: discount=Math.round((1-bid/Math.max(utilityUnlocked+remaining*.4,1))*100); $: bankFloor=annualMint*(mintFee/100); $: actualFees=actualMint*(mintFee/100); $: topUp=Math.max(bankFloor-actualFees,0); $: protocolAnnual=saas*12+bankFloor+(bid*trades*tradeFee/100); $: bankTrade=bid*trades*bankRoyalty/100; $: partnerTrade=bid*trades*partnerRoyalty/100;
 </script>
 
-<svelte:head><title>CreditFlow Atlas — stakeholder operating model</title><meta name="description" content="An interactive end-to-end operating model for a bank-grade credit builder rewards platform."/></svelte:head>
-
-<div class="shell">
-  <aside>
-    <div class="brand"><span class="mark">Cƒ</span><div><b>CreditFlow</b><small>ATLAS / 01</small></div></div>
-    <p class="eyebrow">Choose a perspective</p>
-    <div class="roles">
-      {#each Object.entries(roles) as [key,item]}
-        <button class:active={role===key} onclick={()=>role=key as Role} style={`--accent:${item.color}`}><i>{item.abbr}</i><span>{item.label}<small>{item.objective}</small></span></button>
-      {/each}
-    </div>
-    <div class="side-note"><span>Design principle</span><p>Reward progress. Intervene early. Never turn customer distress into marketplace inventory.</p></div>
-  </aside>
-
-  <main>
-    <header><div><span class="live"><i></i> OPERATING MODEL</span><h1>One system.<br/><em>Seven truths.</em></h1></div><div class="header-meta"><span>Bank-grade concept</span><b>v1.0</b></div></header>
-    <nav>{#each nav as item}<button class:active={section===item.id} onclick={()=>section=item.id}>{item.label}</button>{/each}</nav>
-
-    {#if section==='overview'}
-      <section class="hero-grid">
-        <div class="role-card" style={`--role:${r.color}`}><span class="kicker">YOUR LENS / {r.abbr}</span><h2>{r.label}</h2><p>{r.objective}</p><div class="decision"><span>DECISION TO PROVE</span>{r.decision}</div></div>
-        <div class="value-map">
-          <div class="orbit">
-            <div class="core"><small>ORCHESTRATION</small><b>CreditFlow<br/>Platform</b><span>rules • evidence • settlement</span></div>
-            {#each Object.entries(roles).slice(1,6) as [key,item],i}<button class:selected={role===key} class={`node n${i+1}`} onclick={()=>role=key as Role} style={`--node:${item.color}`}><i>{item.abbr}</i><span>{item.label}</span></button>{/each}
-          </div>
-          <div class="legend"><span><i class="mint"></i>value</span><span><i class="amber"></i>evidence</span><span><i class="blue"></i>control</span></div>
-        </div>
-        <div class="exchange"><div><span>CONTRIBUTES</span>{#each r.gives as x}<p>↗ {x}</p>{/each}</div><div><span>RECEIVES</span>{#each r.gets as x}<p>↙ {x}</p>{/each}</div></div>
-      </section>
-      <section class="metric-row">{#each r.kpis as metric,i}<article><span>0{i+1}</span><b>{metric}</b><small>{i===0?'PRIMARY OUTCOME':i===1?'HEALTH SIGNAL':'VALUE PROOF'}</small></article>{/each}</section>
-      <div class="narrative"><span>THE BUSINESS IN ONE SENTENCE</span><p>A white-label bank platform converts verified repayment progress into funded partner benefits, intervenes before hardship becomes delinquency, and proves incremental value to every participant through a shared evidence layer.</p></div>
-    {:else if section==='suite'}
-      <Suite {role} roleLabel={r.label} roleColor={r.color}/>
-    {:else if section==='journey'}
-      <section class="section-head"><span>END-TO-END WORKFLOW</span><h2>From product approval to measurable outcome.</h2><p>Every step has an accountable owner, a customer-facing event, and evidence that survives audit.</p></section>
-      <div class="timeline">{#each steps as step}<article><span class="num">{step.n}</span><div><small>{step.owner}</small><h3>{step.title}</h3><p>{step.body}</p><b>✓ {step.proof}</b></div></article>{/each}</div>
-    {:else if section==='economics'}
-      <section class="section-head"><span>SCENARIO ENGINE</span><h2>Make the value pool explicit.</h2><p>Illustrative economics only. Replace assumptions with pilot evidence before any commercial commitment.</p></section>
-      <div class="lab"><div class="sliders">
-        <label><span>Active accounts <b>{loanVolume.toLocaleString()}</b></span><input type="range" min="1000" max="100000" step="1000" bind:value={loanVolume}/></label>
-        <label><span>Platform fee / account / month <b>${monthlyFee.toFixed(2)}</b></span><input type="range" min="0.5" max="8" step="0.1" bind:value={monthlyFee}/></label>
-        <label><span>Completion improvement <b>{completionLift}%</b></span><input type="range" min="0" max="30" bind:value={completionLift}/></label>
-        <label><span>Partner contribution / account <b>${partnerContribution}</b></span><input type="range" min="0" max="80" bind:value={partnerContribution}/></label>
-        <button class="save" onclick={saveScenario}>{saved?'SCENARIO SAVED ✓':'SAVE SCENARIO'}</button>
-      </div><div class="outcomes"><span>ANNUAL VALUE POOL</span><strong>${Math.round(ecosystemValue).toLocaleString()}</strong><div><article><small>Platform ARR</small><b>${Math.round(arr).toLocaleString()}</b></article><article><small>Bank completion value</small><b>${Math.round(completionValue).toLocaleString()}</b></article><article><small>Partner-funded value</small><b>${Math.round(partnerValue).toLocaleString()}</b></article></div><p>North-star test: total incremental value must exceed reward, servicing, integration, fraud, compliance and capital costs.</p></div></div>
-      <div class="revenue-stack">{#each [['Platform license','Predictable annual access'],['Usage commitment','Reserved account capacity'],['Implementation','Integration and controls'],['Campaign fee','Measured partner activation'],['Analytics add-on','Cohorts and experiments']] as item,i}<article><i>0{i+1}</i><b>{item[0]}</b><span>{item[1]}</span></article>{/each}</div>
-    {:else if section==='architecture'}
-      <section class="section-head"><span>REFERENCE ARCHITECTURE</span><h2>Regulated edges. Neutral orchestration core.</h2><p>The bank remains system of record for credit. Partners remain system of record for benefit inventory.</p></section>
-      <div class="architecture"><div class="lane"><span>BANK CONTROL PLANE</span><div>Loan origination</div><div>Servicing events</div><div>Credit reporting</div><div>Hardship actions</div></div><div class="platform-lane"><span>CREDITFLOW PLATFORM</span><div class="arch-core"><b>API Gateway</b><b>Eligibility & rules</b><b>Entitlement ledger</b><b>Consent vault</b><b>Settlement</b><b>Evidence warehouse</b></div><small>Signed events → idempotent processing → reconciled outcomes</small></div><div class="lane"><span>PARTNER CONTROL PLANE</span><div>Offer inventory</div><div>Member enrollment</div><div>Redemption</div><div>Attribution</div></div></div>
-      <div class="tech"><article><span>WEB</span><b>Svelte 5</b><p>Role-guided presentation and operating cockpit.</p></article><article><span>CORE</span><b>Axum / Rust</b><p>Typed APIs, rules, settlement and audit events.</p></article><article><span>DATA</span><b>rusqlite</b><p>Pilot persistence with migration path to managed Postgres.</p></article><article><span>DESKTOP</span><b>Tauri 2</b><p>Secure offline partner presentation shell.</p></article></div>
-    {:else if section==='controls'}
-      <section class="section-head"><span>TRUST ARCHITECTURE</span><h2>Controls are part of the product.</h2><p>No participant can create customer-impacting value without authorization, evidence and a reversal path.</p></section>
-      <div class="controls">{#each controls as c,i}<article><span>GATE {i+1}</span><h3>{c[0]}</h3><p>{c[1]}</p><b>Owner · {c[2]}</b></article>{/each}</div>
-      <div class="red-line"><b>NON-NEGOTIABLE BOUNDARY</b><p>No public secondary market, no yield-bearing token, no claim that benefits collateralize debt, and no sale of distressed customers’ future value to professional buyers.</p></div>
-    {:else}
-      <section class="section-head"><span>PHASED IMPLEMENTATION</span><h2>Earn complexity through evidence.</h2><p>Each phase has a commercial gate. Do not scale what has not improved customer outcomes.</p></section>
-      <div class="phases">{#each [
-        ['0 · VALIDATE','4–6 weeks','Bank data baseline, customer research, partner inventory design, legal perimeter.','Signed pilot thesis + stop conditions'],
-        ['1 · PILOT BUILD','8–12 weeks','One bank, one partner, fixed milestone rules, consent, audit and settlement.','Security + product approval'],
-        ['2 · CONTROLLED LIVE','6–12 months','Limited cohort plus control group, hardship routing and outcome reporting.','Positive risk-adjusted unit economics'],
-        ['3 · MULTI-PARTNER','3–6 months','Campaign marketplace, configurable rules, automated reconciliation.','Repeatable partner onboarding'],
-        ['4 · SCALE','Ongoing','Multi-bank tenancy, enterprise controls, geographic expansion.','Contracted expansion ARR']
-      ] as p,i}<article><i>{i+1}</i><div><span>{p[0]} · {p[1]}</span><h3>{p[2]}</h3><b>GATE → {p[3]}</b></div></article>{/each}</div>
-      <div class="loop"><span>THE EXECUTION LOOP</span>{#each ['Hypothesis','Configure','Launch','Measure','Review risk','Expand or stop'] as x,i}<div><i>{i+1}</i>{x}</div>{/each}</div>
-    {/if}
-    <footer><span>CREDITFLOW ATLAS</span><p>Strategic product model · Not legal, financial or regulatory advice</p><b>{new Date().getFullYear()}</b></footer>
-  </main>
+<svelte:head><title>CreditVault — Tokenized Credit-Yield Bond System</title><meta name="description" content="Complete interactive architecture of the CreditVault tokenized credit-builder loan ecosystem."/></svelte:head>
+<div class="vault-shell">
+ <aside class="vault-side"><div class="vault-brand"><i>CV</i><div><b>CREDITVAULT</b><small>TOKENIZED CREDIT-YIELD PROTOCOL</small></div></div><p class="side-label">EXPLORE THE SYSTEM</p>{#each chapters as c}<button class:active={chapter===c.id} onclick={()=>chapter=c.id}><span>{c.num}</span>{c.label}</button>{/each}<div class="side-thesis"><span>CORE THESIS</span><p>Transform delayed credit-building value into a behavior-unlocked, tradeable financial asset.</p></div></aside>
+ <main class="vault-main"><header class="vault-top"><div><span>BUSINESS ARCHITECTURE / ORIGINAL MODEL</span><b>White-label B2B fintech infrastructure</b></div><div class="pulse">● PROTOCOL SIMULATION</div></header>
+ {#if chapter==='model'}
+  <section class="vault-hero"><div><span class="overline">THE CREDIT BUILDER LOAN, REENGINEERED</span><h1>Credit today.<br/><em>Utility tomorrow.</em><br/>Liquidity when needed.</h1><p>CreditVault turns a traditional locked-savings credit-builder loan into a tokenized Credit-Yield Bond whose bank, airline and retailer utility unlocks with repayment—and can be sold to private buyers for immediate cash.</p><div class="hero-actions"><button onclick={()=>chapter='lifecycle'}>RUN THE BOND LIFECYCLE →</button><button onclick={()=>chapter='roles'}>VIEW EVERY STAKEHOLDER</button></div></div><div class="bond-visual"><div class="bond-card"><span>CREDIT-YIELD BOND</span><b>CV–2000–001</b><strong>$2,000</strong><small>FUTURE UTILITY VALUE</small><div><i style={`width:${month/12*100}%`}></i></div><footer><span>{month}/12 UNLOCKED</span><span>TRADEABLE</span></footer></div><div class="asset-stack"><span>BANK<small>fee waivers + yield</small></span><span>AIRLINE<small>50k miles + lounge</small></span><span>RETAIL<small>$300 credit + VIP</small></span></div></div></section>
+  <section class="problem-shift"><article><span>OLD PRODUCT</span><h3>Pay for twelve months.<br/>Feel nothing today.</h3><p>Locked principal, delayed gratification, invisible progress and no emergency liquidity.</p></article><i>→</i><article class="new"><span>CREDITVAULT</span><h3>Receive an asset on Day 1.<br/>Make progress liquid.</h3><p>Visible future value, monthly utility unlocks and an optional cash exit through the secondary market.</p></article></section>
+  <section class="loop-map"><h2>The self-reinforcing value loop</h2><div><span>BANK BALANCE SHEET<b>funds loan + guarantees reward demand</b></span><i>01</i><span>PARTNER INVENTORY<b>supplies high-perceived-value utility</b></span><i>02</i><span>BORROWER BEHAVIOR<b>unlocks value through repayment</b></span><i>03</i><span>PRIVATE LIQUIDITY<b>converts future utility into cash</b></span><i>04</i><span>PROTOCOL TOLLS<b>monetizes minting, trades and yield</b></span></div></section>
+ {:else if chapter==='lifecycle'}
+  <Title n="02" over="TOKENIZED BOND ENGINE" title="Follow one bond from origination to graduation." desc="Every action, right and revenue event in the twelve-month lifecycle."/>
+  <div class="month-control"><label>SIMULATED MONTH <b>{month}</b></label><input type="range" min="0" max="12" bind:value={month}/><div><span>Utility unlocked<strong>${Math.round(utilityUnlocked).toLocaleString()}</strong></span><span>Future utility locked<strong>${Math.round(remaining).toLocaleString()}</strong></span><span>Payment streak<strong>{month} months</strong></span></div></div>
+  <div class="life-grid">{#each life as s,i}<article class:reached={month>=Math.min(i*2,12)}><i>{i+1}</i><div><span>{s[0]}</span><h3>{s[1]}</h3><p>{s[2]}</p></div></article>{/each}</div>
+  <div class="unlock-ledger"><div><span>MONTH</span>{#each Array(12) as _,i}<i class:on={i<month}>{i+1}</i>{/each}</div>{#each [['Bank yield / fee utility','$1,200'],['Airline miles + lounge','$500'],['Retail credit + access','$300']] as row}<div><span>{row[0]} <b>{row[1]}</b></span>{#each Array(12) as _,i}<i class:on={i<month}>${i<month?Math.round(parseInt(row[1].replace(/\D/g,''))/12):0}</i>{/each}</div>{/each}</div>
+ {:else if chapter==='roles'}
+  <Title n="03" over="STAKEHOLDER OPERATING MODEL" title="One machine. Seven different reasons to join." desc="Select a role to see exactly what it contributes, receives, operates and monetizes."/>
+  <div class="role-tabs">{#each Object.entries(roles) as [key,r]}<button class:active={role===key} onclick={()=>role=key as Role}><i>{r.icon}</i><span>{r.name}<small>{r.tag}</small></span></button>{/each}</div>
+  <section class="role-detail"><div class="role-intro"><span>{roles[role].icon} / {roles[role].name}</span><h2>{roles[role].why}</h2><div class="role-win"><small>THE WIN</small>{roles[role].win}</div></div><div class="give-get"><article><span>CONTRIBUTES TO THE SYSTEM</span>{#each roles[role].contributes as x}<p>↗ {x}</p>{/each}</article><article><span>EXTRACTS FROM THE SYSTEM</span>{#each roles[role].receives as x}<p>↙ {x}</p>{/each}</article></div></section>
+  <div class="role-workflows">{#each workflows[role] as w,i}<article><i>0{i+1}</i><b>{w[0]}</b><p>{w[1]}</p></article>{/each}</div>
+ {:else if chapter==='market'}
+  <Title n="04" over="THE LIQUIDITY BREAKTHROUGH" title="Turn future utility into emergency cash." desc="The secondary market transfers a partially unlocked bond from the credit builder to a buyer who values its remaining perks more highly."/>
+  <div class="market-sim"><section><span>SELLER / MONTH {month}</span><h3>Credit builder needs liquidity</h3><div class="mini-bond"><b>${face.toLocaleString()} BOND</b><span>${Math.round(utilityUnlocked)} unlocked</span><span>${Math.round(remaining)} future</span></div><label>Buyer cash bid <b>${bid}</b><input type="range" min="100" max="1500" step="25" bind:value={bid}/></label></section><div class="trade-rail"><b>${bid}</b><span>INSTANT CASH</span><i>→</i><small>SMART CONTRACT SETTLEMENT</small><i>←</i><span>BOND RIGHTS</span></div><section><span>BUYER / PRIME CUSTOMER</span><h3>Acquires discounted utility</h3><div class="buyer-value"><p>Bank perks + yield <b>$1,200</b></p><p>Airline utility <b>$500</b></p><p>Retail utility <b>$300</b></p><strong>{discount}% implied discount</strong></div></section></div>
+  <div class="fee-waterfall"><h3>One ${bid} trade — programmable cash split</h3>{#each [['Borrower receives',bid*(1-(bankRoyalty+partnerRoyalty+tradeFee)/100),'#65e8c1'],['Bank royalty',bid*bankRoyalty/100,'#7eabff'],['Airline / retailer royalty',bid*partnerRoyalty/100,'#b99cff'],['CreditVault protocol toll',bid*tradeFee/100,'#f6c66d']] as f}<article><span>{f[0]}</span><b style={`color:${f[2]}`}>${f[1].toFixed(2)}</b><i style={`width:${f[1]/bid*100}%;background:${f[2]}`}></i></article>{/each}</div>
+  <div class="liquidity-backstop"><span>INSTITUTIONAL OFFTAKE</span><h3>$5 million monthly committed bid capacity at a fixed 20% discount.</h3><p>The fund maintains open buy orders. If retail buyers absorb the bonds first, the fund earns a standby fee for guaranteeing market depth.</p></div>
+ {:else if chapter==='offtake'}
+  <Title n="05" over="CONTRACTED NETWORK CERTAINTY" title="Three take-or-pay agreements hold the system together." desc="Capacity, reward supply and secondary liquidity are guaranteed before customer demand arrives."/>
+  <div class="top-grid"><article><span>A / BANK CAPACITY</span><h3>$50m annual bond-mint commitment</h3><p>Bank pays protocol fees on committed volume whether it mints $50m or $20m.</p><dl><dt>Committed</dt><dd>${(annualMint/1e6).toFixed(0)}m</dd><dt>Actual</dt><dd>${(actualMint/1e6).toFixed(0)}m</dd><dt>Take-or-pay top-up</dt><dd>${topUp.toLocaleString()}</dd></dl><label>Actual issuance<input type="range" min="0" max="50000000" step="1000000" bind:value={actualMint}/></label></article><article><span>B / AIRLINE SUPPLY</span><h3>500m miles purchased annually</h3><p>Bank buys wholesale at 0.8¢ per mile. Airline keeps payment even when borrowers do not unlock all miles.</p><dl><dt>Bank commitment</dt><dd>$4.0m</dd><dt>Indicative retail value</dt><dd>$7.5m</dd><dt>Wholesale spread</dt><dd>$3.5m</dd></dl></article><article><span>C / LIQUIDITY FLOOR</span><h3>$5m monthly absorption capacity</h3><p>Fund holds 20%-discount bids. It earns bond upside when used and a standby fee when retail demand clears first.</p><dl><dt>Annual capacity</dt><dd>$60m</dd><dt>Bid discount</dt><dd>20%</dd><dt>Unused capacity</dt><dd>standby fee</dd></dl></article></div>
+  <div class="guarantee-chain"><span>BANK BALANCE SHEET<small>guarantees platform volume</small></span><i>→</i><span>AIRLINE INVENTORY<small>guarantees reward supply</small></span><i>→</i><span>FUND CAPITAL<small>guarantees borrower liquidity</small></span><i>→</i><span>CREDITVAULT<small>collects contracted tolls</small></span></div>
+ {:else if chapter==='economics'}
+  <Title n="06" over="RECURRING REVENUE ENGINE" title="Toll the road, not the borrower." desc="CreditVault sits between balance sheet, loyalty inventory and private capital without becoming the lender or airline."/>
+  <div class="econ-controls"><label>Monthly SaaS fee <b>${saas.toLocaleString()}</b><input type="range" min="10000" max="50000" step="1000" bind:value={saas}/></label><label>Mint fee <b>{mintFee}%</b><input type="range" min=".5" max="1" step=".05" bind:value={mintFee}/></label><label>Trade protocol fee <b>{tradeFee}%</b><input type="range" min=".5" max="2" step=".1" bind:value={tradeFee}/></label><label>Trades per bond <b>{trades}</b><input type="range" min="1" max="8" bind:value={trades}/></label></div>
+  <div class="econ-total"><span>ILLUSTRATIVE CONTRACTED ANNUAL PROTOCOL REVENUE</span><strong>${Math.round(protocolAnnual).toLocaleString()}</strong><p>SaaS ${Math.round(saas*12).toLocaleString()} + bank take-or-pay mint toll ${Math.round(bankFloor).toLocaleString()} + illustrated per-bond trade toll ${(bid*trades*tradeFee/100).toFixed(0)}. Escrow-yield share and implementation revenue excluded.</p></div>
+  <div class="revenue-lines">{#each [['White-label SaaS','$10k–$50k / bank / month','Recurring access to ledger, wallets, market and settlement'],['Minting toll','0.5%–1% of every Credit Bond','Paid on actual or committed minimum annual volume'],['Trading toll','Protocol cut on every resale','Compounds as a bond changes hands'],['Escrow yield share','10% of yield generated','Revenue from locked funds under negotiated structure'],['Implementation','Bank + partner integrations','Upfront configuration and deployment revenue']] as r}<article><span>{r[0]}</span><b>{r[1]}</b><p>{r[2]}</p></article>{/each}</div>
+  <div class="stakeholder-profit"><article><span>BANK</span><b>${bankTrade.toFixed(0)}</b><p>5% royalties across {trades} illustrated trades, plus retention and cross-sell value.</p></article><article><span>PARTNER</span><b>${partnerTrade.toFixed(0)}</b><p>1% royalties across {trades} trades, plus wholesale inventory and acquired demand.</p></article><article><span>BORROWER</span><b>${(bid*(1-(bankRoyalty+partnerRoyalty+tradeFee)/100)).toFixed(0)}</b><p>Net emergency cash on one illustrated sale before any applicable taxes or costs.</p></article></div>
+ {:else if chapter==='software'}
+  <Title n="07" over="WHITE-LABEL SOFTWARE SUITE" title="The middleware that makes six balance sheets behave like one system." desc="CreditVault owns orchestration; each participant retains its native system of record."/>
+  <div class="software-map"><div class="external"><span>BANK CORE</span><b>Loan origination<br/>Locked savings<br/>Payment reporting</b></div><div class="protocol"><span>CREDITVAULT PROTOCOL</span>{#each [['Bond Factory','Mint, burn and lifecycle state'],['Utility Composer','Wrap bank, airline and retail rights'],['Behavior Oracle','Verify on-time payment unlock events'],['Embedded Wallet','Custody inside the bank app'],['Marketplace Engine','Listings, bids, transfers and pricing'],['Royalty Router','Bank, partner and protocol splits'],['Offtake Manager','Capacity, inventory and liquidity floors'],['Settlement Ledger','Cash, rights and reconciliation']] as m}<article><b>{m[0]}</b><small>{m[1]}</small></article>{/each}</div><div class="external"><span>PARTNER + CAPITAL</span><b>Airline loyalty<br/>Retail commerce<br/>Fund order book</b></div></div>
+  <div class="event-flow">{#each [['PAYMENT.POSTED','Bank core → behavior oracle'],['UTILITY.UNLOCKED','Oracle → bond contract'],['BOND.LISTED','Wallet → marketplace'],['BID.MATCHED','Fund / buyer → exchange'],['RIGHTS.TRANSFERRED','Contract → buyer wallet'],['ROYALTIES.SETTLED','Router → four cash ledgers']] as e,i}<article><i>0{i+1}</i><b>{e[0]}</b><span>{e[1]}</span></article>{/each}</div>
+  <div class="stack-note"><span>REQUESTED IMPLEMENTATION STACK</span><h3>Svelte 5 experience · Axum protocol API · rusqlite operating ledger · Tauri bank/partner desktop shell</h3><p>Production expansion: bank-grade identity, custody integration, payment rails, smart-contract network, market surveillance, partner adapters and institutional settlement.</p></div>
+ {:else}
+  <Title n="08" over="DUE-DILIGENCE LAYER — NOT A REDESIGN" title="Questions the original model must answer before a bank can launch it." desc="These are implementation workstreams around your invention. They do not remove tokenization, tradeability, royalties, offtake or yield from the canonical model."/>
+  <div class="dd-grid">{#each [['Legal characterization','Define the bond’s rights, security/derivative treatment, marketplace permissions and buyer eligibility.'],['Asset funding','Specify what backs the stated $2,000 future utility and who owes each benefit.'],['Custody and wallets','Choose bank custody, qualified custody or permissioned embedded wallets and recovery rules.'],['Secondary-market conduct','Set pricing, disclosure, surveillance, suitability, transfer and distress-sale protections.'],['Loyalty enforceability','Contract issuer-authorized transfer, expiry, capacity, breakage and redemption obligations.'],['Escrow and yield','Define deposit/escrow ownership, permissible investment, accounting and yield waterfall.'],['Credit preservation','Determine how sale proceeds are directed or encouraged toward continued loan repayment.'],['Offtake enforceability','Price standby fees, minimums, capacity, default remedies and termination rights.'],['Data rights','Govern consented credit, loyalty, purchase and wealth-segment data across parties.'],['Jurisdiction selection','Choose the first country and map lending, securities, payments, tax and consumer law.']] as d,i}<article><span>WORKSTREAM {String(i+1).padStart(2,'0')}</span><h3>{d[0]}</h3><p>{d[1]}</p></article>{/each}</div>
+ {/if}
+ <footer class="vault-footer"><span>CREDITVAULT / ORIGINAL TOKENIZED CREDIT-YIELD MODEL</span><span>Interactive business architecture</span><span>Concept simulation — validate assumptions before launch</span></footer>
+ </main>
 </div>
+
+{#snippet Title(n:string,over:string,title:string,desc:string)}<section class="chapter-title"><i>{n}</i><div><span>{over}</span><h1>{title}</h1><p>{desc}</p></div></section>{/snippet}
