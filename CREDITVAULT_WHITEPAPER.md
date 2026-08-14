@@ -10,6 +10,7 @@ This paper preserves the original CreditVault scheme as the canonical product an
 1. [PURE VOLATILITY DERIVATIVE / uncertainty markets / multicurrency premium payments](https://github.com/LUXERON/PURE-VOLATILITY-DERIVATIVE-_UNCERTAINTY-MARKETS-MULTICURRENCY-PREMIUM-PAYMENTS) supplies an optional multi-currency payment and fee-routing rail. It can quote a USD obligation and settle fees through supported crypto rails with exact integer conservation. It does **not** change the Credit Bond's underlying rights.
 2. [DUALITY PROTOCOL](https://github.com/LUXERON/DUALITY-PROTOCOL) supplies optional, separately funded long/short ERC-4626 outcome vaults. These may hedge measurable cohort or partner-performance risks. They sit beside the Credit Bond and never consume borrower principal or quietly turn the bond into a derivative.
 3. [MAGIC SQUARE AFFILIATE](https://github.com/LUXERON/MAGIC-SQUARE-AFFILIATE) supplies the event-to-share accounting idea for a custom distribution network. CreditVault applies it only to verified customer and portfolio outcomes; recruitment alone earns no commission, borrower principal is never commission inventory, and all promotions are subject to bank approval.
+4. [TBP-Driven Just-In-Time Liquidity Settlement](https://github.com/LUXERON/TBP--DRIVEN-JUST-IN-TIME-JIT-LIQUIDITY-SETTLEMENT) supplies the H12 proof-conditional funding mechanism for CreditVault market makers. Market makers provision dormant `ArmedLock` packages before demand exists and fire capital only for an executable trade. Successful execution produces the proof that releases the agreed atomic payout; failure or silence matures the timelocked recovery path. TBP-JIT replaces the assumption that the liquidity fund must leave its entire commitment sitting inside a conventional pooled order-book account.
 
 The existing [CreditVault Atlas repository](https://github.com/LUXERON/creditflow-atlas), `ORIGINAL_MODEL_CANONICAL_SPEC.md`, and the founder's original concept narrative are the controlling source for the scheme described below.
 
@@ -147,8 +148,14 @@ At month twelve, the bank completes its loan process, releases savings according
 ### 5.11 Institutional liquidity fund and market maker
 
 **Objective:** earn discounted utility, trading economics or standby fees while providing a credible liquidity floor.  
-**Workflow:** negotiate mandate → fund/secure capacity → install pricing curve and limits → maintain bids → approve exceptions → settle inventory → hedge, redeem or distribute acquired utility → report capacity.  
+**Workflow:** negotiate mandate → list TBP-JIT risk-sharing packages → provision dormant `ArmedLock` exit pairs without moving capital → receive a signed CreditVault trade intent → require crossable execution, matching armed supply and safe timing → fire the trade-specific funding transaction → settle from execution proof or recover principal after the timelock → report capacity and outcomes.  
 **Risk limits:** monthly notional, issuer/partner concentration, duration, utilization, discount, stale prices, settlement exposure and termination triggers.
+
+#### CreditVault TBP-JIT funding distinction
+
+H12 is a conditional trade-financing mechanism, not a magical guarantee that an asset purchase cannot lose value. The canonical H12 success proof exists only when the financed execution returns at least the market maker's principal `C`, with any realised profit `P`. CreditVault should therefore use TBP-JIT for an executable route—such as a matched acquisition and onward sale/redemption/hedge—whose settlement venue can prove the contracted return condition. The market maker receives `C` plus its net share of `P`; the executing trader receives the remaining net profit; CreditVault receives the agreed operator take-rate; and network fees are conserved in the payout plan.
+
+If a market maker intentionally buys a Credit Bond to hold as inventory, the market maker exchanges cash for the bond and is exposed to its future utility value. That is a delivery-versus-payment purchase, not H12 principal-protected financing, and must not be represented as a failed-trade refund. CreditVault should label these modes **TBP-JIT financed execution** and **principal-at-risk inventory acquisition** so partners can see which risk they accepted.
 
 ### 5.12 CreditVault platform operator
 
@@ -173,6 +180,10 @@ Regulators, auditors, credit bureaus, identity providers, custodians, payment pr
 **Airline inventory agreement.** The bank or designated buyer commits to 500 million miles annually, illustratively at 0.8 cents per mile. The contract addresses program devaluation, award availability, expiry, transfer authorization, substitution, lounge inventory, tax and failure remedies.
 
 **Liquidity agreement.** The fund commits $5 million monthly bid capacity at a stated pricing rule, illustratively a 20% discount. It defines qualifying bonds, price inputs, concentration, settlement funding, unused-capacity standby fees, market disruption, stale valuation and default remedies. “Liquidity floor” must never be presented as unconditional if exclusions exist.
+
+The market maker demonstrates this capacity through a roster of TBP-JIT packages rather than depositing the entire monthly commitment into a shared pool. During **provision**, the interactive MuSig2/adaptor ceremony pre-signs mutually exclusive success and recovery exits and produces dormant `ArmedLock` inventory; no BTC moves. During **fire**, the trigger policy requires the conjunction of signed/unexpired demand, a crossable venue fill, a matching free `ArmedLock`, and the safe timing window `t_lock = t_exec − L − m`. Every fire/wait/reject decision is logged. A Post Office heals and broadcasts the success exit when `π_success` appears; a watchtower broadcasts the pre-signed recovery exit after `Δt` if it does not.
+
+The agreement therefore specifies armed capacity, size bands, pairs/rails, risk-sharing package `M%`, operator rate `O%`, confirmation latency `L`, safety margin `m`, recovery timelock `Δt`, watchtower coverage and maximum concurrent fired notional. Standby fees can reward verified armed capacity while success fees reward actually fired and settled trades.
 
 Together the agreements reduce cold-start risk: bank volume makes platform economics predictable; airline supply makes rewards deliverable; committed bids make the sale option credible. They do not remove the need for stress tests where any one party fails.
 
